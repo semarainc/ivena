@@ -158,14 +158,14 @@
             <br>
             <label for="format">Format:</label>
             <select id="format" class="form-control">
-                <option value="png">PNG</option>
                 <option value="jpg">JPG</option>
+                <option value="png">PNG</option>
             </select>
             <br>
             <label>Hasil Nama:</label>
             <input type="text" id="hasil_nama" class="form-control result-name">
             <br>
-            <button id="downloadBtn" class="btn btn-success">Download</button>
+            <button id="downloadBtn" class="btn btn-success">Simpan</button>
         </div>
     </div>
 
@@ -187,7 +187,7 @@
                         canvas.height = img.height;
                         const ctx = canvas.getContext('2d');
                         ctx.drawImage(img, 0, 0);
-                        canvas.style.display = 'block';
+                        canvas.style.display = 'none';
                     };
                     img.src = event.target.result;
 
