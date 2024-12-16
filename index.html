@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ambil Foto</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            background-color: #000;
+            color: #fff;
+            font-family: Arial, sans-serif;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+
+        h2 {
+            margin-bottom: 20px;
+        }
+
+        #video {
+            border: 4px solid #fff;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+        }
+
+        #snap {
+            background-color: #ff4081;
+            border: none;
+            border-radius: 50%;
+            width: 70px;
+            height: 70px;
+            margin-top: 20px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+            font-size: 20px;
+            color: #fff;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        #snap:hover {
+            background-color: #e91e63;
+        }
+
+        #canvas {
+            display: none; /* Sembunyikan canvas */
+        }
+
+        .modal-content {
+            background-color: #333;
+            color: #fff;
+            border-radius: 10px;
+        }
+
+        .modal-header,
+        .modal-footer {
+            border: none;
+        }
+
+        .modal-title {
+            font-size: 20px;
+        }
+
+        .form-group label {
+            font-weight: bold;
+        }
+
+        .form-control {
+            background-color: #444;
+            color: #fff;
+            border: 1px solid #666;
+        }
+
+        .form-control:focus {
+            background-color: #555;
+            border-color: #ff4081;
+            color: #fff;
+        }
+
+        .btn {
+            border-radius: 5px;
+        }
+
+        .btn-success {
+            background-color: #4caf50;
+        }
+
+        .btn-secondary {
+            background-color: #555;
+        }
+
+        .btn-success:hover {
+            background-color: #45a049;
+        }
+
+        .btn-secondary:hover {
+            background-color: #444;
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-5">
+        <h2 class="text-center">Ambil Foto</h2>
+        <div class="text-center">
+            <video id="video" autoplay></video>
+            <button id="snap" class="btn btn-primary mt-3">Ambil Foto</button>
+        </div>
+        <canvas id="canvas"></canvas>
+        <div id="popup" class="modal fade" tabindex="-1" role="dialog">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Masukkan Nama Foto</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="photoForm">
+                            <div class="form-group">
+                                <label for="kode_pilih">Pilih Kode:</label>
+                                <select class="form-control" id="kode_pilih" required>
+                                    <option value="00. WAKTU MULAI">00. WAKTU MULAI</option>
+                                    <option value="00. WAKTU SELESAI">00. WAKTU SELESAI</option>
+                                    <option value="01. LABEL">01. LABEL</option>
+                                    <option value="02.1 PEMBUNGKUS">02.1 PEMBUNGKUS</option>
+                                    <option value="03.1 BENDA SAMPING JENAZAH">03.1 BENDA SAMPING JENAZAH</option>
+                                    <option value="03.2 BENDA SAMPING JENAZAH">03.2 BENDA SAMPING JENAZAH</option>
+                                    <option value="04.1 PAKAIAN/">04.1 PAKAIAN/</option>
+                                    <option value="04.2 PAKAIAN/">04.2 PAKAIAN/</option>
+                                    <option value="06.1 LEBAM MAYAT">06.1 LEBAM MAYAT</option>
+                                    <option value="06.2 KAKU MAYAT">06.2 KAKU MAYAT</option>
+                                    <option value="06.3 TANDA PEMBUSUKAN">06.3 KAKU MAYAT</option>
+                                    <option value="07.1 RAMBUT">07.1 RAMBUT</option>
+                                    <option value="07.2 ALIS">07.2 ALIS</option>
+                                    <option value="07.3 BULU MATA">07.3 BULU MATA</option>
+                                    <option value="07.4 KUMIS">07.4 KUMIS</option>
+                                    <option value="07.5 JENGGOT">07.5 JENGGOT</option>
+                                    <option value="08. KEPALA">08. KEPALA</option>
+                                    <option value="09.1 MATA KANAN">09.1 MATA KANAN</option>
+                                    <option value="09.2 MATA KIRI">09.2 MATA KIRI</option>
+                                    <option value="10. HIDUNG">10. HIDUNG</option>
+                                    <option value="11 MULUT">11 MULUT</option>
+                                    <option value="12.1 TELINGA KANAN">12.1 TELINGA KANAN</option>
+                                    <option value="12.2 TELINGA KIRI">12.2 TELINGA KIRI</option>
+                                    <option value="13. ALAT KELAMIN">13. ALAT KELAMIN</option>
+                                    <option value="14. LUBANG PELEPASAN">14. LUBANG PELEPASAN</option>
+                                    <option value="15. IDENTIFIKASI UMUM">15. IDENTIFIKASI UMUM</option>
+                                    <option value="16.1 IDENTIFIKASI KHUSUS">16.1 IDENTIFIKASI KHUSUS</option>
+                                    <option value="16.2 IDENTIFIKASI KHUSUS">16.2 IDENTIFIKASI KHUSUS</option>
+                                    <option value="17.1 LUKA + LOKASI">17.1 LUKA + LOKASI [EDIT SESUAI LUKA]</option>
+                                    <option value="17.2 LUKA + LOKASI">17.2 LUKA + LOKASI [EDIT SESUAI LUKA]</option>
+                                    <option value="18.1 LUKA + LOKASI">18.1 PATAH TULANG + LOKASI [EDIT SESUAI FRAKTUR]</option>
+                                    <option value="18.2 LUKA + LOKASI">18.2 PATAH TULANG + LOKASI [EDIT SESUAI FRAKTUR]</option>
+                                    <option value="19.1 LAIN-LAIN/NAMA TEMUAN">19.1 LAIN-LAIN/NAMA TEMUAN [EDIT SESUAI TEMUAN]</option>
+                                    <option value="19.2 LAIN-LAIN/NAMA TEMUAN">19.1 LAIN-LAIN/NAMA TEMUAN [EDIT SESUAI TEMUAN]</option>
+                                    <option value="19.3 LAIN-LAIN/NAMA TEMUAN">19.1 LAIN-LAIN/NAMA TEMUAN [EDIT SESUAI TEMUAN]</option>
+                                    <option value="20.1 NAMA PEMERIKSAAN">20.1 NAMA PEMERIKSAAN [EDIT SESUAI PEMERIKSAAN]</option>
+                                    <option value="20.2 NAMA PEMERIKSAAN">20.2 NAMA PEMERIKSAAN [EDIT SESUAI PEMERIKSAAN]</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="photoName">Nama Foto:</label>
+                                <input type="text" class="form-control" id="photoName" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="hasil_nama">Hasil Nama:</label>
+                                <input type="text" class="form-control" id="hasil_nama">
+                            </div>
+                            <div class="form-group">
+                                <label for="formatSelect">Format:</label>
+                                <select class="form-control" id="formatSelect">
+                                    <option value="jpeg">JPEG</option>
+                                    <option value="png">PNG</option>
+                                </select>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button id="download" class="btn btn-success">Download</button>
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Tutup</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const video = document.getElementById('video');
+            const canvas = document.getElementById('canvas');
+            const context = canvas.getContext('2d');
+
+            // Minta akses ke kamera
+            navigator.mediaDevices.getUserMedia({ video: true })
+                .then(stream => {
+                    video.srcObject = stream;
+                })
+                .catch(err => {
+                    console.error("Gagal mengakses kamera: ", err);
+                });
+
+            // Fungsi untuk memperbarui hasil nama
+            const updateHasilNama = () => {
+                const kodePilih = document.getElementById('kode_pilih').value;
+                const photoName = document.getElementById('photoName').value || '';
+                const format = document.getElementById('formatSelect').value;
+                document.getElementById('hasil_nama').value = `${kodePilih} ${photoName}.${format}`;
+            };
+
+            // Event listener untuk memperbarui hasil nama saat kode atau nama foto diubah
+            document.getElementById('kode_pilih').addEventListener('change', updateHasilNama);
+            document.getElementById('photoName').addEventListener('input', updateHasilNama);
+            document.getElementById('formatSelect').addEventListener('change', updateHasilNama);
+
+            document.getElementById('snap').addEventListener('click', () => {
+                // Atur ukuran canvas sesuai dengan resolusi video
+                canvas.width = video.videoWidth;
+                canvas.height = video.videoHeight;
+
+                context.drawImage(video, 0, 0, canvas.width, canvas.height);
+                canvas.toBlob(blob => {
+                    $('#popup').modal('show');
+                    document.getElementById('download').onclick = () => {
+                        const fileName = document.getElementById('hasil_nama').value || 'foto';
+                        const url = URL.createObjectURL(blob);
+                        const a = document.createElement('a');
+                        a.href = url;
+                        a.download = fileName;
+                        document.body.appendChild(a);
+                        a.click();
+                        document.body.removeChild(a);
+                        URL.revokeObjectURL(url);
+                    };
+                }, 'image/jpeg');
+            });
+        });
+    </script>
+</body>
+</html>
