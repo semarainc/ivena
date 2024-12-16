@@ -108,7 +108,15 @@
     <div class="container mt-5">
         <h2 class="text-center">Ambil Foto</h2>
         <div class="text-center">
+            <select class="form-control" id="cameraSelect">
+                <option value="environment">Kamera Belakang</option>
+                <option value="user">Kamera Depan</option>
+            </select>
             <video id="video" autoplay></video>
+            <div class="mt-3">
+                <button id="zoomIn" class="btn btn-light">Zoom In</button>
+                <button id="zoomOut" class="btn btn-light">Zoom Out</button>
+            </div>
             <button id="snap" class="btn btn-primary mt-3">Ambil Foto</button>
         </div>
         <canvas id="canvas"></canvas>
@@ -126,43 +134,8 @@
                             <div class="form-group">
                                 <label for="kode_pilih">Pilih Kode:</label>
                                 <select class="form-control" id="kode_pilih" required>
-                                    <option value="00. WAKTU MULAI">00. WAKTU MULAI</option>
-                                    <option value="00. WAKTU SELESAI">00. WAKTU SELESAI</option>
-                                    <option value="01. LABEL">01. LABEL</option>
-                                    <option value="02.1 PEMBUNGKUS">02.1 PEMBUNGKUS</option>
-                                    <option value="03.1 BENDA SAMPING JENAZAH">03.1 BENDA SAMPING JENAZAH</option>
-                                    <option value="03.2 BENDA SAMPING JENAZAH">03.2 BENDA SAMPING JENAZAH</option>
-                                    <option value="04.1 PAKAIAN/">04.1 PAKAIAN/</option>
-                                    <option value="04.2 PAKAIAN/">04.2 PAKAIAN/</option>
-                                    <option value="06.1 LEBAM MAYAT">06.1 LEBAM MAYAT</option>
-                                    <option value="06.2 KAKU MAYAT">06.2 KAKU MAYAT</option>
-                                    <option value="06.3 TANDA PEMBUSUKAN">06.3 KAKU MAYAT</option>
-                                    <option value="07.1 RAMBUT">07.1 RAMBUT</option>
-                                    <option value="07.2 ALIS">07.2 ALIS</option>
-                                    <option value="07.3 BULU MATA">07.3 BULU MATA</option>
-                                    <option value="07.4 KUMIS">07.4 KUMIS</option>
-                                    <option value="07.5 JENGGOT">07.5 JENGGOT</option>
-                                    <option value="08. KEPALA">08. KEPALA</option>
-                                    <option value="09.1 MATA KANAN">09.1 MATA KANAN</option>
-                                    <option value="09.2 MATA KIRI">09.2 MATA KIRI</option>
-                                    <option value="10. HIDUNG">10. HIDUNG</option>
-                                    <option value="11 MULUT">11 MULUT</option>
-                                    <option value="12.1 TELINGA KANAN">12.1 TELINGA KANAN</option>
-                                    <option value="12.2 TELINGA KIRI">12.2 TELINGA KIRI</option>
-                                    <option value="13. ALAT KELAMIN">13. ALAT KELAMIN</option>
-                                    <option value="14. LUBANG PELEPASAN">14. LUBANG PELEPASAN</option>
-                                    <option value="15. IDENTIFIKASI UMUM">15. IDENTIFIKASI UMUM</option>
-                                    <option value="16.1 IDENTIFIKASI KHUSUS">16.1 IDENTIFIKASI KHUSUS</option>
-                                    <option value="16.2 IDENTIFIKASI KHUSUS">16.2 IDENTIFIKASI KHUSUS</option>
-                                    <option value="17.1 LUKA + LOKASI">17.1 LUKA + LOKASI [EDIT SESUAI LUKA]</option>
-                                    <option value="17.2 LUKA + LOKASI">17.2 LUKA + LOKASI [EDIT SESUAI LUKA]</option>
-                                    <option value="18.1 LUKA + LOKASI">18.1 PATAH TULANG + LOKASI [EDIT SESUAI FRAKTUR]</option>
-                                    <option value="18.2 LUKA + LOKASI">18.2 PATAH TULANG + LOKASI [EDIT SESUAI FRAKTUR]</option>
-                                    <option value="19.1 LAIN-LAIN/NAMA TEMUAN">19.1 LAIN-LAIN/NAMA TEMUAN [EDIT SESUAI TEMUAN]</option>
-                                    <option value="19.2 LAIN-LAIN/NAMA TEMUAN">19.1 LAIN-LAIN/NAMA TEMUAN [EDIT SESUAI TEMUAN]</option>
-                                    <option value="19.3 LAIN-LAIN/NAMA TEMUAN">19.1 LAIN-LAIN/NAMA TEMUAN [EDIT SESUAI TEMUAN]</option>
-                                    <option value="20.1 NAMA PEMERIKSAAN">20.1 NAMA PEMERIKSAAN [EDIT SESUAI PEMERIKSAAN]</option>
-                                    <option value="20.2 NAMA PEMERIKSAAN">20.2 NAMA PEMERIKSAAN [EDIT SESUAI PEMERIKSAAN]</option>
+                                    <option value="19.1 Nama Jenazah">19.1 Nama Jenazah</option>
+                                    <option value="19.2 Kode Jenazah">19.2 Kode Jenazah</option>
                                 </select>
                             </div>
                             <div class="form-group">
@@ -199,27 +172,59 @@
             const canvas = document.getElementById('canvas');
             const context = canvas.getContext('2d');
 
-            // Minta akses ke kamera
-            navigator.mediaDevices.getUserMedia({ video: true })
-                .then(stream => {
-                    video.srcObject = stream;
-                })
-                .catch(err => {
-                    console.error("Gagal mengakses kamera: ", err);
-                });
+            let currentStream;
+
+            const startCamera = (facingMode) => {
+                if (currentStream) {
+                    currentStream.getTracks().forEach(track => track.stop());
+                }
+                navigator.mediaDevices.getUserMedia({ video: { facingMode } })
+                    .then(stream => {
+                        currentStream = stream;
+                        video.srcObject = stream;
+                    })
+                    .catch(err => {
+                        console.error("Gagal mengakses kamera: ", err);
+                    });
+            };
+
+            // Mulai dengan kamera belakang secara default
+            startCamera({ exact: "environment" });
+
+            // Event listener untuk mengubah kamera
+            document.getElementById('cameraSelect').addEventListener('change', (event) => {
+                const facingMode = event.target.value === 'environment' ? { exact: "environment" } : { exact: "user" };
+                startCamera(facingMode);
+            });
 
             // Fungsi untuk memperbarui hasil nama
             const updateHasilNama = () => {
                 const kodePilih = document.getElementById('kode_pilih').value;
                 const photoName = document.getElementById('photoName').value || '';
                 const format = document.getElementById('formatSelect').value;
-                document.getElementById('hasil_nama').value = `${kodePilih} ${photoName}.${format}`;
+                document.getElementById('hasil_nama').value = `${kodePilih}_${photoName}.${format}`;
             };
 
             // Event listener untuk memperbarui hasil nama saat kode atau nama foto diubah
             document.getElementById('kode_pilih').addEventListener('change', updateHasilNama);
             document.getElementById('photoName').addEventListener('input', updateHasilNama);
             document.getElementById('formatSelect').addEventListener('change', updateHasilNama);
+
+            // Zoom functionality
+            let zoomLevel = 1;
+            const zoomIncrement = 0.1;
+
+            document.getElementById('zoomIn').addEventListener('click', () => {
+                zoomLevel += zoomIncrement;
+                video.style.transform = `scale(${zoomLevel})`;
+            });
+
+            document.getElementById('zoomOut').addEventListener('click', () => {
+                if (zoomLevel > zoomIncrement) {
+                    zoomLevel -= zoomIncrement;
+                    video.style.transform = `scale(${zoomLevel})`;
+                }
+            });
 
             document.getElementById('snap').addEventListener('click', () => {
                 // Atur ukuran canvas sesuai dengan resolusi video
@@ -231,18 +236,7 @@
                     $('#popup').modal('show');
                     document.getElementById('download').onclick = () => {
                         const fileName = document.getElementById('hasil_nama').value || 'foto';
+                        // Ganti karakter '/' dengan '_' untuk menghindari masalah saat menyimpan file
+                        const safeFileName = fileName.replace(/\//g, '_');
                         const url = URL.createObjectURL(blob);
-                        const a = document.createElement('a');
-                        a.href = url;
-                        a.download = fileName;
-                        document.body.appendChild(a);
-                        a.click();
-                        document.body.removeChild(a);
-                        URL.revokeObjectURL(url);
-                    };
-                }, 'image/jpeg');
-            });
-        });
-    </script>
-</body>
-</html>
+                        const a = document.createElement('
