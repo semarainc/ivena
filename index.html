@@ -3,245 +3,233 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ambil Foto</title>
+    <title>Upload Gambar</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <style>
         body {
-            background-color: #000;
-            color: #fff;
-            font-family: Arial, sans-serif;
+            background-color: #f8f9fa;
         }
 
         .container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
+            margin-top: 50px;
         }
 
-        h2 {
-            margin-bottom: 20px;
-        }
-
-        #video {
-            border: 4px solid #fff;
+        .upload-card {
+            padding: 30px;
             border-radius: 10px;
-            box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
-            width: 100%; /* Responsive video */
-            max-width: 640px; /* Max width for video */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            background-color: #ffffff;
         }
 
-        #snap {
-            background-color: #ff4081;
-            border: none;
-            border-radius: 50%;
-            width: 70px;
-            height: 70px;
+        .canvas-container {
+            text-align: center;
             margin-top: 20px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
-            font-size: 20px;
-            color: #fff;
-            cursor: pointer;
-            transition: background-color 0.3s;
         }
 
-        #snap:hover {
-            background-color: #e91e63;
+        .popup {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.7);
         }
 
-        #canvas {
-            display: none; /* Sembunyikan canvas */
-        }
-
-        .modal-content {
-            background-color: #333;
-            color: #fff;
+        .popup-content {
+            background-color: #fefefe;
+            margin: 15% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 90%;
+            max-width: 400px;
             border-radius: 10px;
         }
 
-        .modal-header,
-        .modal-footer {
-            border: none;
-        }
-
-        .modal-title {
-            font-size: 20px;
-        }
-
-        .form-group label {
-            font-weight: bold;
-        }
-
-        .form-control {
-            background-color: #444;
-            color: #fff;
-            border: 1px solid #666;
-        }
-
-        .form-control:focus {
-            background-color: #555;
-            border-color: #ff4081;
-            color: #fff;
-        }
-
-        .btn {
+        #imageCanvas {
+            display: block;
+            margin: 20px auto;
+            border: 1px solid #ddd;
             border-radius: 5px;
         }
 
-        .btn-success {
-            background-color: #4caf50;
+        .close {
+            cursor: pointer;
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
         }
 
-        .btn-secondary {
-            background-color: #555;
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
         }
 
-        .btn-success:hover {
-            background-color: #45a049;
+        /* Custom styles for file input */
+        .custom-file-upload {
+            display: inline-block;
+            padding: 10px;
+            cursor: pointer;
+            border-radius: 5px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            transition: background 0.3s;
         }
 
-        .btn-secondary:hover {
-            background-color: #444;
+        .custom-file-upload:hover {
+            background-color: #0056b3;
+        }
+
+        .custom-file-input {
+            display: none;
+        }
+
+        .result-name {
+            margin-top: 10px;
         }
     </style>
 </head>
 <body>
-    <div class="container mt-5">
-        <h2 class="text-center">Ambil Foto</h2>
-        <div class="text-center">
-            <select class="form-control" id="devicesSelect"></select>
-            <video id="video" autoplay></video>
-            <div class="mt-3">
-                <button id="zoomIn" class="btn btn-light">Zoom In</button>
-                <button id="zoomOut" class="btn btn-light">Zoom Out</button>
-                <button id="btnChangeCamera" class="btn btn-light">Ganti Kamera</button>
-            </div>
-            <button id="snap" class="btn btn-primary mt-3">Ambil Foto</button>
-        </div>
-        <canvas id="canvas"></canvas>
-        <div id="popup" class="modal fade" tabindex="-1" role="dialog">
-            <div class="modal-dialog" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title">Masukkan Nama Foto</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>
-                    <div class="modal-body">
-                        <form id="photoForm">
-                            <div class="form-group">
-                                <label for="kode_pilih">Pilih Kode:</label>
-                                <select class="form-control" id="kode_pilih" required>
-                                    <option value="19.1 Nama Jenazah">19.1 Nama Jenazah</option>
-                                    <option value="19.2 Kode Jenazah">19.2 Kode Jenazah</option>
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <label for="photoName">Nama Foto:</label>
-                                <input type="text" class="form-control" id="photoName" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="hasil_nama">Hasil Nama:</label>
-                                <input type="text" class="form-control" id="hasil_nama">
-                            </div>
-                            <div class="form-group">
-                                <label for="formatSelect">Format:</label>
-                                <select class="form-control" id="formatSelect">
-                                    <option value="jpeg">JPEG</option>
-                                    <option value="png">PNG</option>
-                                </select>
-                            </div>
-                        </form>
-                    </div>
-                    <div class="modal-footer">
-                        <button id="download" class="btn btn-success">Download</button>
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Tutup</button>
-                    </div>
-                </div>
+    <div class="container">
+        <div class="upload-card text-center">
+            <h1>Project Simple Rename Foto</h1>
+            <br>
+            <label class="custom-file-upload">
+                <input type="file" id="fileInput" accept="image/*" capture="camera" class="custom-file-input">
+                Ambil Gambar
+            </label>
+            <div class="text-center">
+                <canvas id="imageCanvas" style="display:none;"></canvas>
             </div>
         </div>
     </div>
 
+    <div id="popup" class="popup">
+        <div class="popup-content">
+            <span class="close" id="closePopup">&times;</span>
+            <label for="kode_pilih">Kode Pilih:</label>
+            <select class="form-control" id="kode_pilih" required>
+                <option value="00. WAKTU MULAI">00. WAKTU MULAI</option>
+                <option value="00. WAKTU SELESAI">00. WAKTU SELESAI</option>
+                <option value="01. LABEL">01. LABEL</option>
+                <option value="02.1 PEMBUNGKUS">02.1 PEMBUNGKUS</option>
+                <option value="03.1 BENDA SAMPING JENAZAH">03.1 BENDA SAMPING JENAZAH</option>
+                <option value="03.2 BENDA SAMPING JENAZAH">03.2 BENDA SAMPING JENAZAH</option>
+                <option value="04.1 PAKAIAN/">04.1 PAKAIAN/</option>
+                <option value="04.2 PAKAIAN/">04.2 PAKAIAN/</option>
+                <option value="06.1 LEBAM MAYAT">06.1 LEBAM MAYAT</option>
+                <option value="06.2 KAKU MAYAT">06.2 KAKU MAYAT</option>
+                <option value="06.3 TANDA PEMBUSUKAN">06.3 KAKU MAYAT</option>
+                <option value="07.1 RAMBUT">07.1 RAMBUT</option>
+                <option value="07.2 ALIS">07.2 ALIS</option>
+                <option value="07.3 BULU MATA">07.3 BULU MATA</option>
+                <option value="07.4 KUMIS">07.4 KUMIS</option>
+                <option value="07.5 JENGGOT">07.5 JENGGOT</option>
+                <option value="08. KEPALA">08. KEPALA</option>
+                <option value="09.1 MATA KANAN">09.1 MATA KANAN</option>
+                <option value="09.2 MATA KIRI">09.2 MATA KIRI</option>
+                <option value="10. HIDUNG">10. HIDUNG</option>
+                <option value="11 MULUT">11 MULUT</option>
+                <option value="12.1 TELINGA KANAN">12.1 TELINGA KANAN</option>
+                <option value="12.2 TELINGA KIRI">12.2 TELINGA KIRI</option>
+                <option value="13. ALAT KELAMIN">13. ALAT KELAMIN</option>
+                <option value="14. LUBANG PELEPASAN">14. LUBANG PELEPASAN</option>
+                <option value="15. IDENTIFIKASI UMUM">15. IDENTIFIKASI UMUM</option>
+                <option value="16.1 IDENTIFIKASI KHUSUS">16.1 IDENTIFIKASI KHUSUS</option>
+                <option value="16.2 IDENTIFIKASI KHUSUS">16.2 IDENTIFIKASI KHUSUS</option>
+                <option value="17.1 LUKA + LOKASI">17.1 LUKA + LOKASI [EDIT SESUAI LUKA]</option>
+                <option value="17.2 LUKA + LOKASI">17.2 LUKA + LOKASI [EDIT SESUAI LUKA]</option>
+                <option value="18.1 LUKA + LOKASI">18.1 PATAH TULANG + LOKASI [EDIT SESUAI FRAKTUR]</option>
+                <option value="18.2 LUKA + LOKASI">18.2 PATAH TULANG + LOKASI [EDIT SESUAI FRAKTUR]</option>
+                <option value="19.1 LAIN-LAIN/NAMA TEMUAN">19.1 LAIN-LAIN/NAMA TEMUAN [EDIT SESUAI TEMUAN]</option>
+                <option value="19.2 LAIN-LAIN/NAMA TEMUAN">19.1 LAIN-LAIN/NAMA TEMUAN [EDIT SESUAI TEMUAN]</option>
+                <option value="19.3 LAIN-LAIN/NAMA TEMUAN">19.1 LAIN-LAIN/NAMA TEMUAN [EDIT SESUAI TEMUAN]</option>
+                <option value="20.1 NAMA PEMERIKSAAN">20.1 NAMA PEMERIKSAAN [EDIT SESUAI PEMERIKSAAN]</option>
+                <option value="20.2 NAMA PEMERIKSAAN">20.2 NAMA PEMERIKSAAN [EDIT SESUAI PEMERIKSAAN]</option>
+            </select>
+            <br>
+            <label for="photoName">Nama Foto:</label>
+            <input type="text" id="photoName" class="form-control">
+            <br>
+            <label for="format">Format:</label>
+            <select id="format" class="form-control">
+                <option value="png">PNG</option>
+                <option value="jpg">JPG</option>
+            </select>
+            <br>
+            <label>Hasil Nama:</label>
+            <input type="text" id="hasil_nama" class="form-control result-name">
+            <br>
+            <button id="downloadBtn" class="btn btn-success">Download</button>
+        </div>
+    </div>
+
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <script>
-        (function () {
-            if (
-                !"mediaDevices" in navigator ||
-                !"getUserMedia" in navigator.mediaDevices
-            ) {
-                alert("Camera API is not available in your browser");
-                return;
+        document.getElementById('fileInput').addEventListener('change', function() {
+            const input = this;
+            if (input.files.length > 0) {
+                const file = input.files[0];
+                const reader = new FileReader();
+
+                reader.onload = function(event) {
+                    const img = new Image();
+                    img.onload = function() {
+                        const canvas = document.getElementById('imageCanvas');
+                        canvas.width = img.width;
+                        canvas.height = img.height;
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0);
+                        canvas.style.display = 'block';
+                    };
+                    img.src = event.target.result;
+
+                    document.getElementById('popup').style.display = 'block';
+                };
+
+                reader.readAsDataURL(file);
             }
+        });
 
-            // get page elements
-            const video = document.querySelector("#video");
-            const canvas = document.querySelector("#canvas");
+        document.getElementById('closePopup').addEventListener('click', function() {
+            document.getElementById('popup').style.display = 'none';
+            // Sembunyikan canvas ketika popup ditutup
+            document.getElementById('imageCanvas').style.display = 'none';
+        });
 
-            // current video stream
-            let videoStream;
-            let useFrontCamera = true; // Default to front camera
-            let videoTrack;
+        document.getElementById('kode_pilih').addEventListener('change', updateFileName);
+        document.getElementById('photoName').addEventListener('input', updateFileName);
+        document.getElementById('format').addEventListener('change', updateFileName);
 
-            // initialize camera
-            async function initializeCamera() {
-                if (videoStream) {
-                    videoStream.getTracks().forEach(track => track.stop());
-                }
+        function updateFileName() {
+            const kodePilih = document.getElementById('kode_pilih').value;
+            const photoName = document.getElementById('photoName').value;
+            const format = document.getElementById('format').value;
+            const hasilNama = `${kodePilih} ${photoName}.${format}`;
+            document.getElementById('hasil_nama').value = hasilNama;
+        }
 
-                const facingMode = useFrontCamera ? "user" : "environment";
-                try {
-                    videoStream = await navigator.mediaDevices.getUserMedia({
-                        video: { facingMode: facingMode }
-                    });
-                    video.srcObject = videoStream;
-                    videoTrack = videoStream.getVideoTracks()[0]; // Get the video track for zooming
-                } catch (err) {
-                    alert("Could not access the camera");
-                }
-            }
+        document.getElementById('downloadBtn').addEventListener('click', function() {
+            const canvas = document.getElementById('imageCanvas');
+            const hasilNama = document.getElementById('hasil_nama').value;
+            canvas.toBlob(function(blob) {
+                const url = URL.createObjectURL(blob);
 
-            // switch camera
-            document.getElementById('btnChangeCamera').addEventListener('click', function () {
-                useFrontCamera = !useFrontCamera; // Toggle camera usage
-                initializeCamera();
-            });
-
-            // take screenshot
-            document.getElementById('snap').addEventListener('click', function () {
-                canvas.width = video.videoWidth;
-                canvas.height = video.videoHeight;
-                const context = canvas.getContext("2d");
-                context.drawImage(video, 0, 0);
-                const img = canvas.toDataURL("image/png");
-                // Show the modal for downloading or displaying the image
-            });
-
-            // Zoom functionality
-            let zoomLevel = 1;
-            const zoomIncrement = 0.1;
-
-            document.getElementById('zoomIn').addEventListener('click', async () => {
-                zoomLevel += zoomIncrement;
-                await videoTrack.applyConstraints({
-                    advanced: [{ zoom: zoomLevel }]
-                });
-            });
-
-            document.getElementById('zoomOut').addEventListener('click', async () => {
-                if (zoomLevel > zoomIncrement) {
-                    zoomLevel -= zoomIncrement;
-                    await videoTrack.applyConstraints({
-                        advanced: [{ zoom: zoomLevel }]
-                    });
-                }
-            });
-
-            // Initialize the camera on page load
-            initializeCamera();
-        })();
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = hasilNama;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+            }, 'image/jpg');
+        });
     </script>
 </body>
 </html>
