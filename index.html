@@ -28,6 +28,8 @@
             border: 4px solid #fff;
             border-radius: 10px;
             box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+            width: 100%; /* Responsive video */
+            max-width: 640px; /* Max width for video */
         }
 
         #snap {
@@ -108,14 +110,12 @@
     <div class="container mt-5">
         <h2 class="text-center">Ambil Foto</h2>
         <div class="text-center">
-            <select class="form-control" id="cameraSelect">
-                <option value="environment">Kamera Belakang</option>
-                <option value="user">Kamera Depan</option>
-            </select>
+            <select class="form-control" id="devicesSelect"></select>
             <video id="video" autoplay></video>
             <div class="mt-3">
                 <button id="zoomIn" class="btn btn-light">Zoom In</button>
                 <button id="zoomOut" class="btn btn-light">Zoom Out</button>
+                <button id="btnChangeCamera" class="btn btn-light">Ganti Kamera</button>
             </div>
             <button id="snap" class="btn btn-primary mt-3">Ambil Foto</button>
         </div>
@@ -167,76 +167,81 @@
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const video = document.getElementById('video');
-            const canvas = document.getElementById('canvas');
-            const context = canvas.getContext('2d');
+        (function () {
+            if (
+                !"mediaDevices" in navigator ||
+                !"getUserMedia" in navigator.mediaDevices
+            ) {
+                alert("Camera API is not available in your browser");
+                return;
+            }
 
-            let currentStream;
+            // get page elements
+            const video = document.querySelector("#video");
+            const canvas = document.querySelector("#canvas");
 
-            const startCamera = (facingMode) => {
-                if (currentStream) {
-                    currentStream.getTracks().forEach(track => track.stop());
+            // current video stream
+            let videoStream;
+            let useFrontCamera = true; // Default to front camera
+            let videoTrack;
+
+            // initialize camera
+            async function initializeCamera() {
+                if (videoStream) {
+                    videoStream.getTracks().forEach(track => track.stop());
                 }
-                navigator.mediaDevices.getUserMedia({ video: { facingMode } })
-                    .then(stream => {
-                        currentStream = stream;
-                        video.srcObject = stream;
-                    })
-                    .catch(err => {
-                        console.error("Gagal mengakses kamera: ", err);
+
+                const facingMode = useFrontCamera ? "user" : "environment";
+                try {
+                    videoStream = await navigator.mediaDevices.getUserMedia({
+                        video: { facingMode: facingMode }
                     });
-            };
+                    video.srcObject = videoStream;
+                    videoTrack = videoStream.getVideoTracks()[0]; // Get the video track for zooming
+                } catch (err) {
+                    alert("Could not access the camera");
+                }
+            }
 
-            // Mulai dengan kamera belakang secara default
-            startCamera({ exact: "environment" });
-
-            // Event listener untuk mengubah kamera
-            document.getElementById('cameraSelect').addEventListener('change', (event) => {
-                const facingMode = event.target.value === 'environment' ? { exact: "environment" } : { exact: "user" };
-                startCamera(facingMode);
+            // switch camera
+            document.getElementById('btnChangeCamera').addEventListener('click', function () {
+                useFrontCamera = !useFrontCamera; // Toggle camera usage
+                initializeCamera();
             });
 
-            // Fungsi untuk memperbarui hasil nama
-            const updateHasilNama = () => {
-                const kodePilih = document.getElementById('kode_pilih').value;
-                const photoName = document.getElementById('photoName').value || '';
-                const format = document.getElementById('formatSelect').value;
-                document.getElementById('hasil_nama').value = `${kodePilih}_${photoName}.${format}`;
-            };
-
-            // Event listener untuk memperbarui hasil nama saat kode atau nama foto diubah
-            document.getElementById('kode_pilih').addEventListener('change', updateHasilNama);
-            document.getElementById('photoName').addEventListener('input', updateHasilNama);
-            document.getElementById('formatSelect').addEventListener('change', updateHasilNama);
+            // take screenshot
+            document.getElementById('snap').addEventListener('click', function () {
+                canvas.width = video.videoWidth;
+                canvas.height = video.videoHeight;
+                const context = canvas.getContext("2d");
+                context.drawImage(video, 0, 0);
+                const img = canvas.toDataURL("image/png");
+                // Show the modal for downloading or displaying the image
+            });
 
             // Zoom functionality
             let zoomLevel = 1;
             const zoomIncrement = 0.1;
 
-            document.getElementById('zoomIn').addEventListener('click', () => {
+            document.getElementById('zoomIn').addEventListener('click', async () => {
                 zoomLevel += zoomIncrement;
-                video.style.transform = `scale(${zoomLevel})`;
+                await videoTrack.applyConstraints({
+                    advanced: [{ zoom: zoomLevel }]
+                });
             });
 
-            document.getElementById('zoomOut').addEventListener('click', () => {
+            document.getElementById('zoomOut').addEventListener('click', async () => {
                 if (zoomLevel > zoomIncrement) {
                     zoomLevel -= zoomIncrement;
-                    video.style.transform = `scale(${zoomLevel})`;
+                    await videoTrack.applyConstraints({
+                        advanced: [{ zoom: zoomLevel }]
+                    });
                 }
             });
 
-            document.getElementById('snap').addEventListener('click', () => {
-                // Atur ukuran canvas sesuai dengan resolusi video
-                canvas.width = video.videoWidth;
-                canvas.height = video.videoHeight;
-
-                context.drawImage(video, 0, 0, canvas.width, canvas.height);
-                canvas.toBlob(blob => {
-                    $('#popup').modal('show');
-                    document.getElementById('download').onclick = () => {
-                        const fileName = document.getElementById('hasil_nama').value || 'foto';
-                        // Ganti karakter '/' dengan '_' untuk menghindari masalah saat menyimpan file
-                        const safeFileName = fileName.replace(/\//g, '_');
-                        const url = URL.createObjectURL(blob);
-                        const a = document.createElement('
+            // Initialize the camera on page load
+            initializeCamera();
+        })();
+    </script>
+</body>
+</html>
