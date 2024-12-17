@@ -108,6 +108,15 @@
             </div>
         </div>
     </div>
+    <div class="container">
+        <div class="upload-card text-center">
+            <h1>Kamera Tidak Muncul?</h1>
+            <br>
+            <label class="custom-file-upload">
+                Silahkan Gunakan Browser yang didukung seperti Firefox atau Chrome
+            </label>
+        </div>
+    </div>
 
     <div id="popup" class="popup">
         <div class="popup-content">
@@ -122,9 +131,11 @@
                 <option value="03.2 BENDA SAMPING JENAZAH">03.2 BENDA SAMPING JENAZAH</option>
                 <option value="04.1 PAKAIAN/">04.1 PAKAIAN/</option>
                 <option value="04.2 PAKAIAN/">04.2 PAKAIAN/</option>
+                <option value="05.1 PERHIASAN">05.1 PERHIASAN/</option>
+                <option value="05.2 PERHIASAN">05.2 PERHIASAN/</option>
                 <option value="06.1 LEBAM MAYAT">06.1 LEBAM MAYAT</option>
                 <option value="06.2 KAKU MAYAT">06.2 KAKU MAYAT</option>
-                <option value="06.3 TANDA PEMBUSUKAN">06.3 KAKU MAYAT</option>
+                <option value="06.3 TANDA PEMBUSUKAN">06.3 TANDA PEMBUSUKAN</option>
                 <option value="07.1 RAMBUT">07.1 RAMBUT</option>
                 <option value="07.2 ALIS">07.2 ALIS</option>
                 <option value="07.3 BULU MATA">07.3 BULU MATA</option>
@@ -134,7 +145,7 @@
                 <option value="09.1 MATA KANAN">09.1 MATA KANAN</option>
                 <option value="09.2 MATA KIRI">09.2 MATA KIRI</option>
                 <option value="10. HIDUNG">10. HIDUNG</option>
-                <option value="11 MULUT">11 MULUT</option>
+                <option value="11. MULUT">11. MULUT</option>
                 <option value="12.1 TELINGA KANAN">12.1 TELINGA KANAN</option>
                 <option value="12.2 TELINGA KIRI">12.2 TELINGA KIRI</option>
                 <option value="13. ALAT KELAMIN">13. ALAT KELAMIN</option>
@@ -146,23 +157,23 @@
                 <option value="17.2 LUKA + LOKASI">17.2 LUKA + LOKASI [EDIT SESUAI LUKA]</option>
                 <option value="18.1 LUKA + LOKASI">18.1 PATAH TULANG + LOKASI [EDIT SESUAI FRAKTUR]</option>
                 <option value="18.2 LUKA + LOKASI">18.2 PATAH TULANG + LOKASI [EDIT SESUAI FRAKTUR]</option>
-                <option value="19.1 LAIN-LAIN/NAMA TEMUAN">19.1 LAIN-LAIN/NAMA TEMUAN [EDIT SESUAI TEMUAN]</option>
-                <option value="19.2 LAIN-LAIN/NAMA TEMUAN">19.1 LAIN-LAIN/NAMA TEMUAN [EDIT SESUAI TEMUAN]</option>
-                <option value="19.3 LAIN-LAIN/NAMA TEMUAN">19.1 LAIN-LAIN/NAMA TEMUAN [EDIT SESUAI TEMUAN]</option>
-                <option value="20.1 NAMA PEMERIKSAAN">20.1 NAMA PEMERIKSAAN [EDIT SESUAI PEMERIKSAAN]</option>
-                <option value="20.2 NAMA PEMERIKSAAN">20.2 NAMA PEMERIKSAAN [EDIT SESUAI PEMERIKSAAN]</option>
+                <option value="19.1 LAIN-LAIN/TULIS NAMA TEMUAN">19.1 LAIN-LAIN/NAMA TEMUAN [EDIT SESUAI TEMUAN]</option>
+                <option value="19.2 LAIN-LAIN/TULIS NAMA TEMUAN">19.1 LAIN-LAIN/NAMA TEMUAN [EDIT SESUAI TEMUAN]</option>
+                <option value="19.3 LAIN-LAIN/TULIS NAMA TEMUAN">19.1 LAIN-LAIN/NAMA TEMUAN [EDIT SESUAI TEMUAN]</option>
+                <option value="20.1 TULIS NAMA PEMERIKSAAN KHUSUS">20.1 NAMA PEMERIKSAAN [EDIT SESUAI PEMERIKSAAN]</option>
+                <option value="20.2 TULIS NAMA PEMERIKSAAN KHUSUS">20.2 NAMA PEMERIKSAAN [EDIT SESUAI PEMERIKSAAN]</option>
             </select>
-            <br>
+            <!--<br>
             <label for="photoName">Nama Foto:</label>
             <input type="text" id="photoName" class="form-control">
             <br>
             <label for="format">Format:</label>
             <select id="format" class="form-control">
-                <option value="jpg">JPG</option>
+                <option value="jpeg">JPG</option>
                 <option value="png">PNG</option>
-            </select>
+            </select> -->
             <br>
-            <label>Hasil Nama:</label>
+            <label>Hasil Nama [Ubah Jika Tidak Sesuai]:</label>
             <input type="text" id="hasil_nama" class="form-control result-name">
             <br>
             <button id="downloadBtn" class="btn btn-success">Simpan</button>
@@ -173,6 +184,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <script>
+        let selectionCount = {};
         document.getElementById('fileInput').addEventListener('change', function() {
             const input = this;
             if (input.files.length > 0) {
@@ -192,10 +204,21 @@
                     img.src = event.target.result;
 
                     document.getElementById('popup').style.display = 'block';
+                    updateFileName(document.getElementById('kode_pilih').value);
                 };
 
                 reader.readAsDataURL(file);
             }
+        });
+
+        document.getElementById('kode_pilih').addEventListener('change', function() {
+            const selectedValue = this.value;
+            console.log(selectedValue);
+            // Cek dan hitung jumlah pemilihan
+            if (!selectionCount[selectedValue]) {
+                selectionCount[selectedValue] = 1;
+            }
+            updateFileName(selectedValue);
         });
 
         document.getElementById('closePopup').addEventListener('click', function() {
@@ -204,31 +227,58 @@
             document.getElementById('imageCanvas').style.display = 'none';
         });
 
-        document.getElementById('kode_pilih').addEventListener('change', updateFileName);
-        document.getElementById('photoName').addEventListener('input', updateFileName);
-        document.getElementById('format').addEventListener('change', updateFileName);
+        //document.getElementById('kode_pilih').addEventListener('change', updateFileName);
+        //document.getElementById('photoName').addEventListener('input', updateFileName);
+        //document.getElementById('format').addEventListener('change', updateFileName);
 
-        function updateFileName() {
-            const kodePilih = document.getElementById('kode_pilih').value;
-            const photoName = document.getElementById('photoName').value;
-            const format = document.getElementById('format').value;
-            const hasilNama = `${kodePilih} ${photoName}.${format}`;
-            document.getElementById('hasil_nama').value = hasilNama;
+        function updateFileName(selectedValue) {
+        console.log("FFF " + selectedValue);
+            if (selectedValue == "00. WAKTU MULAI" || selectedValue == "00. WAKTU SELESAI"){
+                 const hasilNama = `${selectedValue}.jpg`; // Selalu simpan sebagai JPG
+                 console.log(hasilNama);
+                 document.getElementById('hasil_nama').value = hasilNama;
+            }
+            else{
+                const index = selectionCount[selectedValue] === 1 ? '(1)' : `(${selectionCount[selectedValue]})`;
+                const hasilNama = `${selectedValue} ${index}.jpg`; // Selalu simpan sebagai JPG
+                console.log(hasilNama);
+                document.getElementById('hasil_nama').value = hasilNama;
+            }
         }
 
         document.getElementById('downloadBtn').addEventListener('click', function() {
             const canvas = document.getElementById('imageCanvas');
             const hasilNama = document.getElementById('hasil_nama').value;
+
+            // Mengatur kualitas untuk JPG (0.1 - 1.0)
+            const quality = 0.8; // Sesuaikan kualitas untuk JPG
+
+            const downloadBtn = document.getElementById('downloadBtn');
+            downloadBtn.innerText = "Tunggu...";
+            downloadBtn.disabled = true;
+
+            // Mengonversi canvas ke blob
             canvas.toBlob(function(blob) {
                 const url = URL.createObjectURL(blob);
 
                 const a = document.createElement('a');
                 a.href = url;
-                a.download = hasilNama;
+                a.download = hasilNama; // Nama file sudah ditentukan dalam format JPG
                 document.body.appendChild(a);
                 a.click();
                 document.body.removeChild(a);
-            }, `image/${format}`);
+
+
+                // Update selectionCount setelah download
+                const selectedValue = document.getElementById('kode_pilih').value;
+                selectionCount[selectedValue]++;
+
+                // Kembalikan teks dan aktifkan tombol setelah download selesai
+                downloadBtn.innerText = "Simpan";
+                downloadBtn.disabled = false;
+
+
+            }, 'image/jpeg', quality); // Selalu menyimpan sebagai JPG
         });
     </script>
 </body>
