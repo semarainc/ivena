@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>I-Vena Project</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <style>
         body {
             background-color: #f8f9fa;
@@ -122,6 +123,11 @@
         .guide-btn:hover {
             background-color: #0056b3; /* Warna lebih gelap saat hover */
         }
+        .default-name-btn {
+            font-size: 12px; /* Ukuran font lebih kecil */
+            padding: 5px 10px; /* Padding lebih kecil */
+            margin-left: 5px; /* Jarak dengan input */
+        }
     </style>
 </head>
 <body>
@@ -174,10 +180,10 @@
                 <option value="02.1 PEMBUNGKUS">02.1 PEMBUNGKUS</option>
                 <option value="03.1 BENDA SAMPING JENAZAH">03.1 BENDA SAMPING JENAZAH</option>
                 <option value="03.2 BENDA SAMPING JENAZAH">03.2 BENDA SAMPING JENAZAH</option>
-                <option value="04.1 PAKAIAN/">04.1 PAKAIAN/</option>
-                <option value="04.2 PAKAIAN/">04.2 PAKAIAN/</option>
-                <option value="05.1 PERHIASAN">05.1 PERHIASAN/</option>
-                <option value="05.2 PERHIASAN">05.2 PERHIASAN/</option>
+                <option value="04.1 PAKAIAN／">04.1 PAKAIAN/[Jenis Pakaian]</option>
+                <option value="04.2 PAKAIAN／">04.2 PAKAIAN/[Jenis Pakaian]</option>
+                <option value="05.1 PERHIASAN">05.1 PERHIASAN</option>
+                <option value="05.2 PERHIASAN">05.2 PERHIASAN</option>
                 <option value="06.1 LEBAM MAYAT">06.1 LEBAM MAYAT</option>
                 <option value="06.2 KAKU MAYAT">06.2 KAKU MAYAT</option>
                 <option value="06.3 TANDA PEMBUSUKAN">06.3 TANDA PEMBUSUKAN</option>
@@ -202,9 +208,9 @@
                 <option value="17.2 LUKA + LOKASI">17.2 LUKA + LOKASI [EDIT SESUAI LUKA]</option>
                 <option value="18.1 LUKA + LOKASI">18.1 PATAH TULANG + LOKASI [EDIT SESUAI FRAKTUR]</option>
                 <option value="18.2 LUKA + LOKASI">18.2 PATAH TULANG + LOKASI [EDIT SESUAI FRAKTUR]</option>
-                <option value="19.1 LAIN-LAIN/TULIS NAMA TEMUAN">19.1 LAIN-LAIN/NAMA TEMUAN [EDIT SESUAI TEMUAN]</option>
-                <option value="19.2 LAIN-LAIN/TULIS NAMA TEMUAN">19.1 LAIN-LAIN/NAMA TEMUAN [EDIT SESUAI TEMUAN]</option>
-                <option value="19.3 LAIN-LAIN/TULIS NAMA TEMUAN">19.1 LAIN-LAIN/NAMA TEMUAN [EDIT SESUAI TEMUAN]</option>
+                <option value="19.1 LAIN-LAIN／TULIS NAMA TEMUAN">19.1 LAIN-LAIN/[NAMA TEMUAN [EDIT SESUAI TEMUAN]]</option>
+                <option value="19.2 LAIN-LAIN／TULIS NAMA TEMUAN">19.1 LAIN-LAIN/[NAMA TEMUAN [EDIT SESUAI TEMUAN]]</option>
+                <option value="19.3 LAIN-LAIN／TULIS NAMA TEMUAN">19.1 LAIN-LAIN/[NAMA TEMUAN [EDIT SESUAI TEMUAN]]</option>
                 <option value="20.1 TULIS NAMA PEMERIKSAAN KHUSUS">20.1 NAMA PEMERIKSAAN [EDIT SESUAI PEMERIKSAAN]</option>
                 <option value="20.2 TULIS NAMA PEMERIKSAAN KHUSUS">20.2 NAMA PEMERIKSAAN [EDIT SESUAI PEMERIKSAAN]</option>
             </select>
@@ -219,9 +225,15 @@
             </select> -->
             <br>
             <label>Hasil Nama [Ubah Jika Tidak Sesuai]:</label>
-            <input type="text" id="hasil_nama" class="form-control result-name">
+            <div class="input-group-append">
+                 <input type="text" id="hasil_nama" class="form-control result-name">
+                <button onclick="updateFileName(document.getElementById('kode_pilih').value);" class="btn btn-outline-secondary default-name-btn" id="defaultNameBtn" title="Set to Default Name">
+                    <i class="fas fa-undo"></i> Reset
+                </button>
+            </div>
             <br>
             <button id="downloadBtn" class="btn btn-success">Simpan</button>
+
         </div>
     </div>
 
