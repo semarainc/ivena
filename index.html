@@ -159,7 +159,7 @@
             <span class="close" id="closePopup2">&times;</span>
             <h5>Panduan Penggunaan</h5>
             <img src="panduan.jpg" alt="Panduan" style="width: 100%; border-radius: 10px;">
-            <p>Gunakan fitur unggah untuk menambahkan gambar dan ikuti petunjuk yang ada.</p>
+            <p>Gunakan fitur unggah untuk menambahkan gambar dan ikuti petunjuk yang ada. Jika nama tidak ada dalam list, anda dapat melakukan edit sendiri pada <b>"Hasil Nama"</b></p>
         </div>
     </div>
 
@@ -230,6 +230,7 @@
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <script>
         let selectionCount = {};
+        let dupdownload = 0;
         document.getElementById('fileInput').addEventListener('change', function() {
             const input = this;
             if (input.files.length > 0) {
@@ -249,6 +250,9 @@
                     img.src = event.target.result;
 
                     document.getElementById('popup').style.display = 'block';
+                    if (!selectionCount[document.getElementById('kode_pilih').value]) {
+                        selectionCount[document.getElementById('kode_pilih').value] = 1;
+                    }
                     updateFileName(document.getElementById('kode_pilih').value);
                 };
 
@@ -283,6 +287,11 @@
             document.getElementById('popup').style.display = 'none';
             // Sembunyikan canvas ketika popup ditutup
             document.getElementById('imageCanvas').style.display = 'none';
+
+            //ensure that is the new image being take again
+            dupdownload = 0;
+            const selectedValue = document.getElementById('kode_pilih').value;
+            selectionCount[selectedValue]++;
         });
 
         //document.getElementById('kode_pilih').addEventListener('change', updateFileName);
@@ -297,7 +306,8 @@
                  document.getElementById('hasil_nama').value = hasilNama;
             }
             else{
-                const index = selectionCount[selectedValue] === 1 ? '(1)' : `(${selectionCount[selectedValue]})`;
+                const index = selectionCount[selectedValue] == 1 ? '(1)' : `(${selectionCount[selectedValue]})`;
+                console.log(selectionCount);
                 const hasilNama = `${selectedValue} ${index}.jpg`; // Selalu simpan sebagai JPG
                 console.log(hasilNama);
                 document.getElementById('hasil_nama').value = hasilNama;
@@ -325,11 +335,11 @@
                 document.body.appendChild(a);
                 a.click();
                 document.body.removeChild(a);
+                console.log("DUPDOWNLOAD: ", dupdownload);
 
-
-                // Update selectionCount setelah download
-                const selectedValue = document.getElementById('kode_pilih').value;
-                selectionCount[selectedValue]++;
+                if (dupdownload == 0){
+                    dupdownload = 1;
+                }
 
                 // Kembalikan teks dan aktifkan tombol setelah download selesai
                 downloadBtn.innerText = "Simpan";
