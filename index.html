@@ -92,12 +92,42 @@
         .result-name {
             margin-top: 10px;
         }
+                /* Gaya untuk tombol Donasi */
+        .donate-btn {
+            background-color: #28a745; /* Hijau */
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 10px 20px;
+            font-size: 16px;
+            transition: background 0.3s;
+        }
+
+        .donate-btn:hover {
+            background-color: #218838; /* Warna lebih gelap saat hover */
+        }
+
+        /* Gaya untuk tombol Panduan */
+        .guide-btn {
+            margin-top: 20px;
+            background-color: #F67300; /* Biru */
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 10px 20px;
+            font-size: 16px;
+            transition: background 0.3s;
+        }
+
+        .guide-btn:hover {
+            background-color: #0056b3; /* Warna lebih gelap saat hover */
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="upload-card text-center">
-            <h1>Project Simple Rename Foto v1</h1>
+            <h1>Project Simple Rename Foto v1.2</h1>
             <br>
             <label class="custom-file-upload">
                 <input type="file" id="fileInput" accept="image/*" capture="camera" class="custom-file-input">
@@ -115,6 +145,21 @@
             <label class="custom-file-upload">
                 Silahkan Gunakan Browser yang didukung seperti Firefox atau Chrome
             </label>
+            <div class="text-center">
+                <canvas id="imageCanvas" style="display:none;"></canvas>
+            </div>
+            <button class="guide-btn" id="guideBtn">Panduan</button>
+            <button class="donate-btn" id="donateBtn">Donasi</button>
+        </div>
+        </div>
+    </div>
+
+    <div id="popup" class="popup">
+        <div class="popup-content">
+            <span class="close" id="closePopup">&times;</span>
+            <h5>Panduan Penggunaan</h5>
+            <img src="panduan.jpg" alt="Panduan" style="width: 100%; border-radius: 10px;">
+            <p>Gunakan fitur unggah untuk menambahkan gambar dan ikuti petunjuk yang ada.</p>
         </div>
     </div>
 
@@ -209,6 +254,21 @@
 
                 reader.readAsDataURL(file);
             }
+        });
+
+        document.getElementById('closePopup').addEventListener('click', function() {
+            document.getElementById('popup').style.display = 'none';
+            // Sembunyikan canvas ketika popup ditutup
+            document.getElementById('imageCanvas').style.display = 'none';
+        });
+
+        // Fungsi untuk menampilkan popup panduan
+        document.getElementById('guideBtn').addEventListener('click', function() {
+            document.getElementById('popup').style.display = 'block';
+        });
+
+        document.getElementById('donateBtn').addEventListener('click', function() {
+            alert("Terima kasih atas niat baik Anda untuk mendonasikan!");
         });
 
         document.getElementById('kode_pilih').addEventListener('change', function() {
